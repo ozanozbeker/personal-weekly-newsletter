@@ -9,16 +9,20 @@ library(xml2)     # XML Processing
 library(gt)       # HTML Tables
 
 # Scrape Blogs ----
+message("Reading input CSV files...")
 blogs = read_csv("blogs.csv", col_types = "ccc")
 scraped_urls = read_csv("scraped_urls.csv", col_types = "c")
 
+message("Creating requests for blog sitemaps...")
 reqs = blogs |> 
   pull(host) |> 
   str_c("/sitemap.xml") |> 
   map(request)
 
+message("Performing requests...")
 resps = req_perform_sequential(reqs, on_error = "continue")
 
+message("Extracting new posts from successful responses...")
 extract_new_posts = function(resp) {
 
   site = str_remove(resp_url(resp), "/sitemap.xml")
@@ -55,7 +59,8 @@ extract_new_posts = function(resp) {
         str_to_title(),
       post = if_else(post == "", "Post name failed to parse", post)
     )
-    
+  
+  message(str_c("Extracted ", nrow(results), " new posts from ", site))
   return(results)
 }
 
@@ -64,12 +69,14 @@ results = resps_successes(resps) |>
   list_rbind() |> 
   left_join(blogs |> select(-content), join_by(site == host))
 
+message("Updating scraped URLs...")
 results |> 
   select(url) |> 
   union(scraped_urls) |> 
   write_csv("scraped_urls.csv")
 
 # Build Email ----
+message("Building the email table...")
 table = results |> 
   select(author, post, url) |> 
   gt() |> 
@@ -93,15 +100,23 @@ table = results |>
   )
 
 # Send Email ----
-smtp_send(
-  email = compose_email(as_raw_html(table)),
-  subject = str_c("Personal Weekly Newsletter | ", format(Sys.Date(), "%B %m, %Y")),
-  to = Sys.getenv("OUTLOOK_EMAIL"),
-  from = Sys.getenv("SMTP_USER"),
-  credentials = creds_envvar(
-    provider = "gmail",
-    user = Sys.getenv("SMTP_USER"),
-    pass_envvar = "SMTP_PASSWORD"
-  ),
-  verbose = TRUE
-)
+message("Sending the email...")
+tryCatch({
+  smtp_send(
+    email = compose_email(as_raw_html(table)),
+    subject = str_c("Personal Weekly Newsletter | ", format(Sys.Date(), "%B %m, %Y")),
+    to = Sys.getenv("OUTLOOK_EMAIL"),
+    from = Sys.getenv("SMTP_USER"),
+    credentials = creds_envvar(
+      provider = "gmail",
+      user = Sys.getenv("SMTP_USER"),
+      pass_envvar = "SMTP_PASSWORD"
+    ),
+    verbose = TRUE
+  )
+  message("Email sent successfully.")
+}, error = function(e) {
+  message(str_c("Error sending email: ", e$message))
+})
+
+message("Script completed.")
