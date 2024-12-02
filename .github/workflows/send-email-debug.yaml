@@ -14,19 +14,13 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Debug Working Directory
         run: |
           Rscript -e 'readr::write_csv(tibble::tibble(url = c("website.com", "website2.com")), "scraped_urls.csv")'
           pwd
           ls -la
-
-      - name: Reinitialize Git Repository
-        run: |
-          git init
-          git remote add origin https://github.com/ozanozbeker/personal-weekly-newsletter
-
 
       - name: Save New URLs
         run: |
