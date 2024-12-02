@@ -101,22 +101,14 @@ table = results |>
 
 # Send Email ----
 message("Sending the email...")
-tryCatch({
-  smtp_send(
-    email = compose_email(as_raw_html(table)),
-    subject = str_c("Personal Weekly Newsletter | ", format(Sys.Date(), "%B %m, %Y")),
-    to = Sys.getenv("OUTLOOK_EMAIL"),
-    from = Sys.getenv("SMTP_USER"),
-    credentials = creds_envvar(
-      provider = "gmail",
-      user = Sys.getenv("SMTP_USER"),
-      pass_envvar = "SMTP_PASSWORD"
-    ),
-    verbose = TRUE
+smtp_send(
+  email = compose_email(as_raw_html(table)),
+  subject = str_c("Personal Weekly Newsletter | ", format(Sys.Date(), "%B %m, %Y")),
+  to = Sys.getenv("OUTLOOK_EMAIL"),
+  from = Sys.getenv("SMTP_USER"),
+  credentials = creds_envvar(
+    provider = "gmail",
+    user = Sys.getenv("SMTP_USER"),
+    pass_envvar = "SMTP_PASSWORD"
   )
-  message("Email sent successfully.")
-}, error = function(e) {
-  message(str_c("Error sending email: ", e$message))
-})
-
-message("Script completed.")
+)
