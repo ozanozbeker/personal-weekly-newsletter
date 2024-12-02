@@ -15,8 +15,6 @@ jobs:
 
       - name: Install Packages
         uses: r-lib/actions/setup-r-dependencies@v2
-        options: |
-            repos = c(CRAN = "https://packagemanager.posit.co/cran/latest")
         with:
           packages: |
             any::blastula
