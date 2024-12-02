@@ -41,7 +41,7 @@ extract_new_posts = function(resp) {
         xml_text()
     ) |>
     filter(
-      !url %in% scraped_urls$url,
+      # !url %in% scraped_urls$url,
       str_starts(url, regex_filter)
     ) |> 
     mutate(
@@ -99,10 +99,9 @@ smtp_send(
   to = Sys.getenv("OUTLOOK_EMAIL"),
   from = Sys.getenv("SMTP_USER"),
   credentials = creds_envvar(
+    provider = "gmail",
     user = Sys.getenv("SMTP_USER"),
-    pass_envvar = "SMTP_PASSWORD",
-    host = Sys.getenv("SMTP_HOST"),
-    port = as.integer(Sys.getenv("SMTP_PORT")),
-    use_ssl = TRUE
-  )
+    pass_envvar = "SMTP_PASSWORD"
+  ),
+  verbose = TRUE
 )
