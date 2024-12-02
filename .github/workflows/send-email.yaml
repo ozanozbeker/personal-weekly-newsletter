@@ -29,6 +29,7 @@ jobs:
         run: |
           set -e
           echo "Starting email process..."
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           Rscript -e 'source("personal-weekly-newsletter.R")'
           echo "Email sent successfully!"
 

@@ -101,14 +101,35 @@ table = results |>
 
 # Send Email ----
 message("Sending the email...")
-smtp_send(
-  email = compose_email(as_raw_html(table)),
-  subject = str_c("Personal Weekly Newsletter | ", format(Sys.Date(), "%B %m, %Y")),
-  to = Sys.getenv("OUTLOOK_EMAIL"),
-  from = Sys.getenv("SMTP_USER"),
-  credentials = creds_envvar(
-    provider = "gmail",
-    user = Sys.getenv("SMTP_USER"),
-    pass_envvar = "SMTP_PASSWORD"
-  )
-)
+
+max_retries = 2
+attempt = 1
+success = FALSE
+
+while (attempt <= max_retries + 1 && !success) {
+  tryCatch({
+    smtp_send(
+      email = compose_email(as_raw_html(table)),
+      subject = str_c("Personal Weekly Newsletter | ", format(Sys.Date(), "%B %m, %Y")),
+      to = Sys.getenv("OUTLOOK_EMAIL"),
+      from = Sys.getenv("SMTP_USER"),
+      credentials = creds_envvar(
+        provider = "gmail",
+        user = Sys.getenv("SMTP_USER"),
+        pass_envvar = "SMTP_PASSWORD"
+      ),
+      verbose = TRUE
+    )
+    success = TRUE
+  }, error = function(e) {
+    if (attempt <= max_retries) {
+      message("Error occurred: ", e$message)
+      message("Retrying in 5 seconds... (Attempt ",attempt," of ",max_retries,")")
+      Sys.sleep(3)
+    } else {
+      message("Failed to send email after ", max_retries + 1, " attempts.")
+      stop(e)
+    }
+  })
+  attempt = attempt + 1
+}
