@@ -19,7 +19,7 @@ jobs:
       - name: Install Additional R Packages
         run: |
           Rscript -e 'install.packages("pak", repos = "https://packagemanager.posit.co/cran/latest")'
-          Rscript -e 'pak::pkg_install(c("blastula", "httr2", "xml2", "gt"))'
+          Rscript -e 'pak::pkg_install(c("blastula", "httr2", "xml2", "gt", "curl"))'
 
       - name: Send Email
         env:
@@ -29,7 +29,6 @@ jobs:
         run: |
           set -e
           echo "Starting email process..."
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           Rscript -e 'source("personal-weekly-newsletter.R")'
           echo "Email sent successfully!"
 
