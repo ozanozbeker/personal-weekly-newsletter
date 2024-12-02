@@ -16,12 +16,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Debug Environment Variables
-        run: |
-          echo "SMTP_USER: $SMTP_USER"
-          echo "SMTP_HOST: $SMTP_HOST"
-          echo "SMTP_PORT: $SMTP_PORT"
-
       - name: Install Additional R Packages
         run: |
           Rscript -e 'install.packages("pak", repos = "https://packagemanager.posit.co/cran/latest")'
@@ -29,10 +23,9 @@ jobs:
 
       - name: Send Email
         env:
+          OUTLOOK_EMAIL: ${{ secrets.OUTLOOK_EMAIL }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
         run: |
           set -e
           echo "Starting email process..."
