@@ -22,6 +22,12 @@ jobs:
           pwd
           ls -la
 
+      - name: Reinitialize Git Repository
+        run: |
+          git init
+          git remote add origin https://github.com/ozanozbeker/personal-weekly-newsletter
+
+
       - name: Save New URLs
         run: |
           set -e
