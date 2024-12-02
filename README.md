@@ -1,7 +1,5 @@
 # Personal Weekly Newsletter
 
-## Background
-
 Cal Newport discusses the concept of creating your own personal weekly newsletter in his podcast, [Deep Questions](https://www.thedeeplife.com/listen/). I liked the idea so this is my effort to implement it in my effort of living the "deep life".
 
 This single document project scrapes my favorite blogs to see if there are new posts, and sends myself a weekly email notifying which blogs have new posts, with a link.
