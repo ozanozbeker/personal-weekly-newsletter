@@ -102,6 +102,9 @@ table = results |>
 # Send Email ----
 message("Sending the email...")
 
+httr::set_config(httr::config(cookiefile = ""))
+httr::set_config(httr::config(cookiejar = ""))
+
 smtp_send(
   email = compose_email(as_raw_html(table)),
   subject = str_c("Personal Weekly Newsletter | ", format(Sys.Date(), "%B %m, %Y")),

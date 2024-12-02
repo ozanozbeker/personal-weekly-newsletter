@@ -19,7 +19,7 @@ jobs:
       - name: Install Additional R Packages
         run: |
           Rscript -e 'install.packages("pak", repos = "https://packagemanager.posit.co/cran/latest")'
-          Rscript -e 'pak::pkg_install(c("blastula", "httr2", "xml2", "gt", "curl"))'
+          Rscript -e 'pak::pkg_install(c("blastula", "httr2", "xml2", "gt"))'
 
       - name: Send Email
         env:
