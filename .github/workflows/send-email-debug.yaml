@@ -13,18 +13,19 @@ jobs:
       image: rocker/tidyverse:4.4.2
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Debug Working Directory
         run: |
           Rscript -e 'readr::write_csv(tibble::tibble(url = c("website.com", "website2.com")), "scraped_urls.csv")'
           pwd
           ls -la
 
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
       - name: Save New URLs
         run: |
           set -e
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add scraped_urls.csv || echo "No URLs to add"
