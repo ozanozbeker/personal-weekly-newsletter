@@ -1,4 +1,4 @@
-name: Send Weekly Email
+name: Send Weekly Email Debug
 
 on:
   schedule:
