@@ -13,14 +13,14 @@ jobs:
       image: rocker/tidyverse:4.4.2
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
-
       - name: Debug Working Directory
         run: |
           Rscript -e 'readr::write_csv(tibble::tibble(url = c("website.com", "website2.com")), "scraped_urls.csv")'
           pwd
           ls -la
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Save New URLs
         run: |
