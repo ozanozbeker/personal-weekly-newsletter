@@ -5,24 +5,27 @@ library(dplyr)    # Data Manipulation
 library(purrr)    # Functional Programming
 library(readr)    # Data Read/Write
 library(httr2)    # HTTP Requests
+library(log4r)    # Logging
 library(xml2)     # XML Processing
 library(gt)       # HTML Tables
 
+logger = logger(appenders = file_appender("script.log"))
+
 # Scrape Blogs ----
-message("Reading input CSV files...")
+info(logger, "Reading input CSV files...")
 blogs = read_csv("blogs.csv", col_types = "ccc")
 scraped_urls = read_csv("scraped_urls.csv", col_types = "c")
 
-message("Creating requests for blog sitemaps...")
+info(logger, "Creating requests for blog sitemaps...")
 reqs = blogs |> 
   pull(host) |> 
   str_c("/sitemap.xml") |> 
   map(request)
 
-message("Performing requests...")
+info(logger, "Performing requests...")
 resps = req_perform_sequential(reqs, on_error = "continue")
 
-message("Extracting new posts from successful responses...")
+info(logger, "Extracting new posts from successful responses...")
 extract_new_posts = function(resp) {
 
   site = str_remove(resp_url(resp), "/sitemap.xml")
@@ -60,7 +63,7 @@ extract_new_posts = function(resp) {
       post = if_else(post == "", "Post name failed to parse", post)
     )
   
-  message(str_c("Extracted ", nrow(results), " new posts from ", site))
+  info(logger, str_c("Extracted ", nrow(results), " new posts from ", site))
   return(results)
 }
 
@@ -69,14 +72,14 @@ results = resps_successes(resps) |>
   list_rbind() |> 
   left_join(blogs |> select(-content), join_by(site == host))
 
-message("Updating scraped URLs...")
+info(logger, "Updating scraped URLs...")
 results |> 
   select(url) |> 
   union(scraped_urls) |> 
   write_csv("scraped_urls.csv")
 
 # Build Email ----
-message("Building the email table...")
+info(logger, "Building the email table...")
 table = results |> 
   select(author, post, url) |> 
   gt() |> 
@@ -100,10 +103,7 @@ table = results |>
   )
 
 # Send Email ----
-message("Sending the email...")
-
-httr::set_config(httr::config(cookiefile = ""))
-httr::set_config(httr::config(cookiejar = ""))
+info(logger, "Sending the email...")
 
 smtp_send(
   email = compose_email(as_raw_html(table)),
@@ -117,3 +117,5 @@ smtp_send(
   ),
   verbose = TRUE
 )
+
+info(logger, "Email has been sent!")

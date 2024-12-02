@@ -14,4 +14,4 @@ Instead of scraping the listings page page of each blog, which can vary across b
 
 ## Build & Send Email
 
-[{gt}](https://gt.rstudio.com/) will create an HTML table which will be the body of the email, [{blastula}](https://rstudio.github.io/blastula/index.html) will send the email using my Gmail account for SMTP, & GitHub actions will create a runner weekly to run the code.
+[{gt}](https://gt.rstudio.com/) will create an HTML table which will be the body of the email, [{blastula}](https://rstudio.github.io/blastula/index.html) will send the email using my Gmail account for SMTP, & Task Scheduler will run the code automatically for me on Sundays.
