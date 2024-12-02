@@ -102,7 +102,7 @@ smtp_send(
     user = Sys.getenv("SMTP_USER"),
     pass_envvar = "SMTP_PASSWORD",
     host = Sys.getenv("SMTP_HOST"),
-    port = Sys.getenv("SMTP_PORT"),
+    port = as.integer(Sys.getenv("SMTP_PORT")),
     use_ssl = TRUE
   )
 )
