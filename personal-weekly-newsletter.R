@@ -45,7 +45,7 @@ extract_new_posts = function(resp) {
         xml_text()
     ) |>
     filter(
-      # !url %in% scraped_urls$url,
+      !url %in% scraped_urls$url,
       str_starts(url, regex_filter)
     ) |> 
     mutate(
